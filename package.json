@@ -1,0 +1,25 @@
+{
+  "name": "Empolyee_CMS",
+  "version": "1.0.0",
+  "description": "Developers are often tasked with creating interfaces that make it easy for non-developers to view and interact with information stored in databases. Often these interfaces are known as **C**ontent **M**anagement **S**ystems. In this homework assignment, your challenge is to architect and build a solution for managing a company's employees using node, inquirer, and MySQL.",
+  "main": "runCMS.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node runCMS.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/JManauth/Empolyee_CMS.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/JManauth/Empolyee_CMS/issues"
+  },
+  "homepage": "https://github.com/JManauth/Empolyee_CMS#readme",
+  "dependencies": {
+    "inquirer": "^8.1.2",
+    "mysql": "^2.18.1"
+  }
+}
