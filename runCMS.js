@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-const { inherits } = require('util');
+const { createPromptModule } = require('inquirer');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -13,11 +13,13 @@ const connection = mysql.createConnection({
 connection.connect((err) => {
     if (err) throw err;
     console.log(`Succesfully Connected to employees_db`);
+    console.log('Welcome to Jafet Manauth Enterprises\' Employee CMS');
+    console.log('\n');
     init();
 });
 
 function init(){
-    console.log('Welcome to Jafet Manauth Enterprises\' Employee CMS');
+    
     inquirer
     .prompt({
         name: 'action',
@@ -27,6 +29,7 @@ function init(){
             'View All...',
             'Add...',
             'Update...',
+            'EXIT',
         ]
     })
     .then((answer) => {
@@ -118,6 +121,9 @@ function init(){
                     }
                 });
                 break;
+            case 'EXIT':
+                console.log('Thank you for using our Empolyee CMS Software today!');
+                return process.exit();
             default:
                 console.log('something went wrong in the what would you like to do today tree');
                 break;
@@ -127,7 +133,31 @@ function init(){
 };
 
 function viewEmployees(){
-    console.log('wasssup foo you made it this far');
+    console.log('Displaying All Employees \n');
+    const query = 'SELECT first_name, last_name, role_title, salary, dep_name FROM employee, role, department WHERE employee.role_id = employees_db.role.role_id AND role.department_id = department.dep_id;';
+    let employees = [];
+    function Employee(firstName, lastName, role, salary, department){
+        this.firstName = firstName;
+        this.lastName = lastName;
+        this.Role = role;
+        this.Salary = salary;
+        this.Department = department;
+    } 
+        connection.query(query, (err, res) => {
+            if (err) throw err;
+            res.forEach(({first_name, last_name, role_title, salary, dep_name}) => {
+               var first_name = new Employee(first_name, last_name, role_title, salary, dep_name);
+               employees.push(first_name);
+            })
+            console.table(employees);
+            /*res.forEach(({first_name, last_name, role_title, salary, dep_name}) => {
+                console.log(
+                last_name + ', ' + first_name + ' || ' + role_title + ' || ' + salary + ' || ' + dep_name 
+                );
+            })*/
+            console.log('\n');
+            init(); 
+        });
 };
 
 function viewRoles(){
