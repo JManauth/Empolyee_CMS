@@ -1,6 +1,6 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
-const { createPromptModule } = require('inquirer');
+const cTable = require('console.table');
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -12,7 +12,7 @@ const connection = mysql.createConnection({
 
 connection.connect((err) => {
     if (err) throw err;
-    console.log(`Succesfully Connected to employees_db`);
+    console.log(`Succesfully Connected to employees_db \n`);
     console.log('Welcome to Jafet Manauth Enterprises\' Employee CMS');
     console.log('\n');
     init();
@@ -29,6 +29,7 @@ function init(){
             'View All...',
             'Add...',
             'Update...',
+            'Search...',
             'EXIT',
         ]
     })
@@ -134,38 +135,42 @@ function init(){
 
 function viewEmployees(){
     console.log('Displaying All Employees \n');
-    const query = 'SELECT first_name, last_name, role_title, salary, dep_name FROM employee, role, department WHERE employee.role_id = employees_db.role.role_id AND role.department_id = department.dep_id;';
-    let employees = [];
-    function Employee(firstName, lastName, role, salary, department){
+    const query = 'SELECT id, first_name, last_name, role_title, salary, dep_name FROM employee, role, department WHERE employee.role_id = employees_db.role.role_id AND role.department_id = department.dep_id;';
+   /* function Employee(firstName, lastName, role, salary, department){
         this.firstName = firstName;
         this.lastName = lastName;
         this.Role = role;
         this.Salary = salary;
         this.Department = department;
-    } 
+    } */
         connection.query(query, (err, res) => {
             if (err) throw err;
-            res.forEach(({first_name, last_name, role_title, salary, dep_name}) => {
-               var first_name = new Employee(first_name, last_name, role_title, salary, dep_name);
-               employees.push(first_name);
-            })
-            console.table(employees);
-            /*res.forEach(({first_name, last_name, role_title, salary, dep_name}) => {
-                console.log(
-                last_name + ', ' + first_name + ' || ' + role_title + ' || ' + salary + ' || ' + dep_name 
-                );
-            })*/
+            console.table(res);
             console.log('\n');
             init(); 
         });
 };
 
 function viewRoles(){
-    console.log('wassup foo you made it this far');
+    console.log('\n Displaying All Roles \n');
+    const query = 'SELECT role_id, role_title, salary FROM role';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        console.log('\n');
+        init();
+    })
 };
 
 function viewDepartments(){
-    console.log('wassup foo you made it this far');
+    console.log('\n Displaying All Departments \n');
+    const query = 'SELECT * FROM department';
+    connection.query(query, (err, res) => {
+        if (err) throw err;
+        console.table(res);
+        console.log('\n');
+        init();
+    })
 };
 
 function addEmployee(){

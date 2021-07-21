@@ -19,6 +19,7 @@
   },
   "homepage": "https://github.com/JManauth/Empolyee_CMS#readme",
   "dependencies": {
+    "console.table": "^0.10.0",
     "inquirer": "^8.1.2",
     "mysql": "^2.18.1"
   }
