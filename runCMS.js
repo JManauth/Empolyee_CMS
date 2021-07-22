@@ -3,6 +3,7 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 
 let rolesArray = [];
+let deptArray = [];
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -26,9 +27,9 @@ function init(){
     .prompt({
         name: 'action',
         type: 'list',
-        message: 'What would you like to do today?',
+        message: 'Welcome! How can I be of assitance today?',
         choices: [
-            'View All...',
+            'View...',
             'Add...',
             'Update...',
             'Search...',
@@ -37,7 +38,7 @@ function init(){
     })
     .then((answer) => {
         switch(answer.action) {
-            case 'View All...':
+            case 'View...':
                 inquirer
                 .prompt({
                     name: 'viewChoice',
@@ -125,7 +126,7 @@ function init(){
                 });
                 break;
             case 'EXIT':
-                console.log('Thank you for using our Empolyee CMS Software today!');
+                console.log('\nThank you for using our Empolyee CMS Software today!');
                 return process.exit();
             default:
                 console.log('something went wrong in the what would you like to do today tree');
@@ -207,14 +208,51 @@ function addEmployee2(){
         connection.query(query, (err, res) =>{
             if(err) throw err;
             console.log(`\n${ans.fname}  ${ans.lname} has been succesfully added to the system!\n`);
+            init();
         });
     }) 
-
 };
 function addRole(){
-    console.log('wassup foo you made it this far');
-};
+    const query = 'SELECT dep_name FROM department'
 
+    connection.query(query, (err, res) =>{
+        if(err) throw err;
+        res.forEach(({dep_name}) =>{
+        deptArray.push(dep_name);
+        });
+        addRole2();
+    })
+};
+function addRole2() {
+    inquirer
+    .prompt([
+        {
+            name:'title',
+            type:'input',
+            message:'Role Title:'
+        },
+        {
+            name:'salary',
+            type:'input',
+            message:'Salary:'
+        },
+        {
+            name:'dept',
+            type:'list',
+            message:'Department:',
+            choices: deptArray
+        }
+    ])
+    .then((ans) => {
+        const query = `INSERT INTO role (role_title, salary, department_id) \n
+        VALUES('${ans.title}', ${ans.salary}, ${deptArray.indexOf(ans.dept) +1})`;
+        connection.query(query, (err, res) => {
+            if(err) throw err;
+            console.log(`\n ${ans.title} Has been succesfully added to ${ans.dept} with a salary of ${ans.salary}\n`)
+            init();
+        });
+    })
+};
 function addDepartment(){
     console.log('wassup foo you made it this far');
 };
