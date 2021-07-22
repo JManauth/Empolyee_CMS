@@ -2,6 +2,8 @@ const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
 
+let rolesArray = [];
+
 const connection = mysql.createConnection({
     host: 'localhost',
     port: 3306,
@@ -136,13 +138,6 @@ function init(){
 function viewEmployees(){
     console.log('Displaying All Employees \n');
     const query = 'SELECT id, first_name, last_name, role_title, salary, dep_name FROM employee, role, department WHERE employee.role_id = employees_db.role.role_id AND role.department_id = department.dep_id;';
-   /* function Employee(firstName, lastName, role, salary, department){
-        this.firstName = firstName;
-        this.lastName = lastName;
-        this.Role = role;
-        this.Salary = salary;
-        this.Department = department;
-    } */
         connection.query(query, (err, res) => {
             if (err) throw err;
             console.table(res);
@@ -173,10 +168,49 @@ function viewDepartments(){
     })
 };
 
-function addEmployee(){
-    console.log('wassup foo you made it this far');
+ function addEmployee(){
+    const roleInq = 'SELECT role_id, role_title FROM role';
+
+
+    connection.query(roleInq, (err, res) => {
+        if (err) throw err;
+            res.forEach(({role_title}) => {
+                rolesArray.push(role_title);
+            });
+        
+         addEmployee2();
+    }); 
 };
 
+function addEmployee2(){
+    inquirer
+    .prompt([
+        {
+        name: 'fname',
+        type: 'input',
+        message: 'First Name:'
+        },
+        {
+            name:'lname',
+            type:'input',
+            message:'Last Name:',
+        },
+        {
+            name:'role',
+            type:'list',
+            message:'Employee Role',
+            choices: rolesArray,
+        }
+    ])
+    .then((ans) => {
+        let query = `INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES('${ans.fname}', '${ans.lname}', ${rolesArray.indexOf(ans.role) + 1}, 0)`;
+        connection.query(query, (err, res) =>{
+            if(err) throw err;
+            console.log(`\n${ans.fname}  ${ans.lname} has been succesfully added to the system!\n`);
+        });
+    }) 
+
+};
 function addRole(){
     console.log('wassup foo you made it this far');
 };
