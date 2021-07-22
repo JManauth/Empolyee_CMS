@@ -1,6 +1,7 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
+const { Console } = require('console');
 
 let rolesArray = [];
 let deptArray = [];
@@ -29,16 +30,16 @@ function init(){
         type: 'list',
         message: 'Welcome! How can I be of assitance today?',
         choices: [
-            'View...',
-            'Add...',
-            'Update...',
-            'Search...',
+            'View',
+            'Add',
+            'Update',
+            'Search',
             'EXIT',
         ]
     })
     .then((answer) => {
         switch(answer.action) {
-            case 'View...':
+            case 'View':
                 inquirer
                 .prompt({
                     name: 'viewChoice',
@@ -67,7 +68,7 @@ function init(){
                     }
                 });
                 break;
-            case 'Add...':
+            case 'Add':
                 inquirer
                 .prompt({
                     name:'addChoice',
@@ -96,7 +97,7 @@ function init(){
                     }
                 });
                 break;
-            case 'Update...':
+            case 'Update':
                 inquirer
                 .prompt({
                     name:'updateChoice',
@@ -254,7 +255,20 @@ function addRole2() {
     })
 };
 function addDepartment(){
-    console.log('wassup foo you made it this far');
+    inquirer
+    .prompt({
+        name: 'dept',
+        type:'input',
+        message:'Department Name:'
+    })
+    .then((ans) => {
+        const query = `INSERT INTO department (dep_name) VALUES ('${ans.dept}')`;
+        connection.query(query, (err, res) => {
+            if(err) throw err;
+            console.log(`\n ${ans.dept} has been succesfully added to Departments\n`);
+            init();
+        })
+    });
 };
 
 function updateEmployee(){
