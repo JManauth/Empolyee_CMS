@@ -1,10 +1,12 @@
 const mysql = require('mysql');
 const inquirer = require('inquirer');
 const cTable = require('console.table');
-const { Console } = require('console');
+
 
 let rolesArray = [];
 let deptArray = [];
+let managersArray = [];
+let employeeUpdateId = [];
 
 const connection = mysql.createConnection({
     host: 'localhost',
@@ -44,22 +46,22 @@ function init(){
                 .prompt({
                     name: 'viewChoice',
                     type: 'list',
-                    message: 'Do you want to view all...',
+                    message: 'What do you want to view?',
                     choices: [
-                        'Employees?',
-                        'Roles?',
-                        'Departments?',
+                        'Employees',
+                        'Roles',
+                        'Departments',
                     ]
                 })
                 .then((answer2) => {
                     switch(answer2.viewChoice) {
-                        case 'Employees?':
+                        case 'Employees':
                             viewEmployees();
                             break;
-                        case 'Roles?':
+                        case 'Roles':
                             viewRoles();
                             break;
-                        case 'Departments?':
+                        case 'Departments':
                             viewDepartments();
                             break;
                         default:
@@ -138,7 +140,7 @@ function init(){
 };
 
 function viewEmployees(){
-    console.log('Displaying All Employees \n');
+    console.log('\nDisplaying All Employees \n');
     const query = 'SELECT id, first_name, last_name, role_title, salary, dep_name FROM employee, role, department WHERE employee.role_id = employees_db.role.role_id AND role.department_id = department.dep_id;';
         connection.query(query, (err, res) => {
             if (err) throw err;
@@ -171,17 +173,28 @@ function viewDepartments(){
 };
 
  function addEmployee(){
+    rolesArray = [];
+     managersArray = [];
     const roleInq = 'SELECT role_id, role_title FROM role';
+    const managerInq = 'SELECT first_name FROM employee WHERE employee.role_id = 3'
 
 
     connection.query(roleInq, (err, res) => {
         if (err) throw err;
-            res.forEach(({role_title}) => {
-                rolesArray.push(role_title);
-            });
-        
-         addEmployee2();
+        res.forEach(({role_title}) => {
+            rolesArray.push(role_title);
+        });
+        addEmployee2();
+    });
+    /*  
+    connection.query(managerInq, (err, res) => {
+        if (err) throw err;
+        res.forEach(({first_name}) =>{
+            managersArray.push(first_name);
+        });
+        addEmployee2();
     }); 
+    */
 };
 
 function addEmployee2(){
@@ -214,6 +227,7 @@ function addEmployee2(){
     }) 
 };
 function addRole(){
+    
     const query = 'SELECT dep_name FROM department'
 
     connection.query(query, (err, res) =>{
@@ -272,7 +286,109 @@ function addDepartment(){
 };
 
 function updateEmployee(){
-    console.log('wassup foo you made it this far');
+    rolesArray = [];
+    employeeUpdateId = [];
+    const roleInq = 'SELECT role_id, role_title FROM role';
+    
+
+    connection.query(roleInq, (err, res) => {
+        if (err) throw err;
+        res.forEach(({role_title}) => {
+            rolesArray.push(role_title);
+        });
+        updateEmployee2();
+    });
+};
+function updateEmployee2(){
+    inquirer
+    .prompt([
+        {
+            name:'id',
+            type: 'input',
+            message: 'Employee ID:'
+        },
+        {
+        name:'choice',
+        type: 'list',
+        Message:'What do you want to update?',
+        choices: [
+            'First Name',
+            'Last Name',
+            'Role',
+            ]
+        },
+    ])
+    .then((ans) => {
+        employeeUpdateId.push(ans.id);
+        switch(ans.choice) {
+            case 'First Name':
+                updateFName();
+                break;
+            case 'Last Name':
+                updateLName();
+                break;
+            case 'Role':
+                updateEmployeeRole();
+                break;
+            default:
+                console.log('\n something went wrong in the update specific thing for employee switch tree foo \n');
+                break;
+        };
+    });
+};
+
+function updateFName(){
+    
+    inquirer
+    .prompt({
+        name:'fName',
+        type: 'input',
+        Message:'First Name:',
+    })
+    .then((ans) =>{
+        const query = `UPDATE employee SET first_name = '${ans.fName}' WHERE id = ${employeeUpdateId}`;
+        connection.query(query, (err, res) =>{
+            if(err) throw err;
+            console.log(`\n First Name was Succesfully updated to ${ans.name}! \n`);
+            init();
+        });
+    });
+};
+
+function updateLName(){
+    inquirer
+    .prompt({
+        name:'lName',
+        type: 'input',
+        Message:'Last Name:',
+    })
+    .then((ans) =>{
+        const query = `UPDATE employee SET last_name = '${ans.lName}' WHERE id = ${employeeUpdateId}`;
+        connection.query(query, (err, res) =>{
+            if(err) throw err;
+            console.log(`\n Last Name was Succesfully updated to ${ans.name}! \n`);
+            init();
+        });
+    });
+};
+
+function updateEmployeeRole(){
+    inquirer
+    .prompt({
+        name:'Role',
+        type: 'list',
+        message:'Role:',
+        choices: rolesArray,
+        
+    })
+    .then((ans) => {
+        const query = `UPDATE employee SET role_id = ${rolesArray.indexOf(ans.Role) + 1} WHERE id = ${employeeUpdateId}`;
+        connection.query(query, (err, res) => {
+            if(err) throw err;
+            console.log(`\nSuccessfuly updated Role to ${ans.Role}\n`);
+            init();
+        });
+    });
 };
 
 function updateRole(){

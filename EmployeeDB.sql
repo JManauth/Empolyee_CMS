@@ -34,6 +34,3 @@ Values ('Markerter', 75000.00, 1), ('Salesman', 85000.00, 2), ('Manager', 75000.
 INSERT INTO employee (first_name, last_name, role_id, manager_id)
 VALUES ('Jafet', 'Manauth', 1, 1), ('BIlly', 'Dorman', 2, 1), ('Zion', 'Flores', 3, 1), ('Todd', 'Harden', 4, 1), ('Melissa', 'Brewer', 5, 1), ('Phil', 'Wise', 6, 1);
 
-SELECT * FROM department;
-SELECT * FROM role;
-SELECT * FROM employee;
